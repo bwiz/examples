@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Observable, Subscription } from 'rxjs';
+import { LoggerService } from '../services/logger.service';
 import { TodoService } from '../services/todo.service';
 
 @Component({
@@ -6,15 +8,28 @@ import { TodoService } from '../services/todo.service';
   templateUrl: './to-do.component.html',
   styleUrls: ['./to-do.component.css'],
 })
-export class ToDoComponent implements OnInit {
+export class ToDoComponent implements OnInit, OnDestroy {
 
-  constructor(public todoService: TodoService) {}
+  constructor(public todoService: TodoService, public loggerService: LoggerService) {}
 
   Input = '';
   loading = false;
   Submitted = false;
+  counter = 0;
 
-  ngOnInit() {}
+  loggerServiceSubscription: Subscription;
+
+  ngOnInit() {
+    // This is needed only because 0 is in JS equal to false and the subscription cannot be used in template
+    this.loggerServiceSubscription = this.loggerService.counter$
+    .subscribe((num: number) => {
+      this.counter = num;
+    });
+  }
+
+  ngOnDestroy() {
+    this.loggerServiceSubscription.unsubscribe();
+  }
 
   addItem() {
     this.Submitted = true;

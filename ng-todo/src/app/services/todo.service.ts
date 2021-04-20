@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ToDo } from '../models/to-do';
+import { LoggerService } from './logger.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,7 @@ export class TodoService {
 
   public todos$ = this._todos.asObservable();
 
-  constructor() {
+  constructor(private loggerService: LoggerService) {
     // Initial state
     this._todos.next([
       new ToDo('clean the house'),
@@ -24,20 +25,23 @@ export class TodoService {
       return;
     }
     this._todos.next([...this._todos.value, new ToDo(input)]);
+    this.loggerService.updateCounter(1);
   }
 
   // Should be observable
-  public async deleteTodo(i: number): Promise<boolean> {
-    return new Promise((resolve, reject) => {
+  public async deleteTodo(i: number): Promise<any> {
+    const p = new Promise((resolve, reject) => {
       setTimeout(() => {
         const todos = this._todos.value;
         todos.splice(i, 1);
 
         this._todos.next(todos);
+        this.loggerService.updateCounter(-1);
 
         resolve(true);
       }, 5000);
     });
+    return p;
   }
 
   public shuffle() {
