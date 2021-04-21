@@ -36,7 +36,7 @@ export class TodoService {
         todos.splice(i, 1);
 
         this._todos.next(todos);
-        this.loggerService.updateCounter(-1);
+        this.loggerService.updateCounter(1);
 
         resolve(true);
       }, 5000);
